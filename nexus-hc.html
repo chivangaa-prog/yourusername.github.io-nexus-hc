@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEXUS·HC Intelligence Suite · NPA Zimbabwe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nx-bg:#ffffff;--nx-bg2:#f7f7f5;--nx-bg3:#f0efe9;
+  --nx-border:rgba(0,0,0,0.1);--nx-border2:rgba(0,0,0,0.2);
+  --nx-text:#1a1a18;--nx-muted:#6b6b67;--nx-hint:#a0a09a;
+  --nx-accent:#1D9E75;--nx-accent2:#0F6E56;
+  --nx-warn:#BA7517;--nx-danger:#A32D2D;--nx-info:#185FA5;
+  --nx-font:'Syne',sans-serif;--nx-mono:'DM Mono',monospace;
+  --radius-md:8px;--radius-lg:12px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --nx-bg:#1c1c1a;--nx-bg2:#242422;--nx-bg3:#2a2a28;
+    --nx-border:rgba(255,255,255,0.1);--nx-border2:rgba(255,255,255,0.2);
+    --nx-text:#f0efe9;--nx-muted:#a0a09a;--nx-hint:#6b6b67;
+  }
+}
+body{font-family:var(--nx-font);color:var(--nx-text);background:var(--nx-bg);min-height:100vh}
+#nexus-root{display:flex;flex-direction:column;min-height:100vh}
+.nx-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid var(--nx-border);background:var(--nx-bg);position:sticky;top:0;z-index:10}
+.nx-logo{display:flex;align-items:center;gap:10px}
+.nx-logo-mark{width:32px;height:32px;background:var(--nx-accent);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.nx-logo-mark svg{width:18px;height:18px}
+.nx-logo-text{font-size:15px;font-weight:700;letter-spacing:-0.3px;color:var(--nx-text)}
+.nx-logo-sub{font-size:10px;color:var(--nx-muted);font-family:var(--nx-mono);letter-spacing:0.5px;text-transform:uppercase}
+.nx-header-right{display:flex;align-items:center;gap:8px}
+.nx-badge{font-size:10px;font-family:var(--nx-mono);padding:3px 8px;border-radius:20px;font-weight:500;letter-spacing:0.3px}
+.nx-badge-live{background:#EAF3DE;color:#3B6D11}
+.nx-badge-org{background:#E1F5EE;color:#0F6E56}
+.nx-nav{display:flex;align-items:center;gap:2px;padding:0 20px;border-bottom:0.5px solid var(--nx-border);background:var(--nx-bg);overflow-x:auto}
+.nx-nav-btn{padding:10px 14px;font-size:12px;font-weight:500;font-family:var(--nx-font);color:var(--nx-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;letter-spacing:0.2px}
+.nx-nav-btn:hover{color:var(--nx-text)}
+.nx-nav-btn.active{color:var(--nx-accent);border-bottom-color:var(--nx-accent)}
+.nx-body{display:flex;flex:1;min-height:0}
+.nx-main{flex:1;overflow-y:auto;padding:20px}
+.nx-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.nx-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.nx-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media(max-width:900px){.nx-grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}.nx-grid-3,.nx-grid-2{grid-template-columns:1fr}.nx-sidebar{display:none!important}}
+.nx-card{background:var(--nx-bg);border:0.5px solid var(--nx-border);border-radius:var(--radius-lg);padding:16px}
+.nx-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.nx-card-title{font-size:12px;font-weight:500;color:var(--nx-muted);text-transform:uppercase;letter-spacing:0.6px;font-family:var(--nx-mono)}
+.nx-metric-val{font-size:26px;font-weight:700;color:var(--nx-text);letter-spacing:-0.5px;line-height:1;margin-bottom:4px}
+.nx-metric-label{font-size:11px;color:var(--nx-muted)}
+.nx-metric-delta{font-size:11px;font-family:var(--nx-mono);padding:2px 6px;border-radius:4px;font-weight:500}
+.delta-up{background:#EAF3DE;color:#3B6D11}
+.delta-down{background:#FCEBEB;color:#A32D2D}
+.delta-warn{background:#FAEEDA;color:#854F0B}
+.nx-section-title{font-size:13px;font-weight:600;color:var(--nx-text);margin-bottom:12px;letter-spacing:-0.2px}
+.nx-risk-bar{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--nx-border)}
+.nx-risk-bar:last-child{border-bottom:none}
+.nx-risk-name{font-size:12px;color:var(--nx-text);width:160px;flex-shrink:0;font-weight:500}
+.nx-risk-track{flex:1;height:6px;background:var(--nx-bg2);border-radius:3px;overflow:hidden}
+.nx-risk-fill{height:100%;border-radius:3px}
+.nx-risk-pct{font-size:11px;font-family:var(--nx-mono);color:var(--nx-muted);width:32px;text-align:right}
+.nx-table{width:100%;border-collapse:collapse;font-size:12px}
+.nx-table th{text-align:left;padding:6px 10px;font-size:10px;font-weight:500;color:var(--nx-hint);text-transform:uppercase;letter-spacing:0.5px;border-bottom:0.5px solid var(--nx-border);font-family:var(--nx-mono)}
+.nx-table td{padding:9px 10px;border-bottom:0.5px solid var(--nx-border);color:var(--nx-text);vertical-align:middle}
+.nx-table tr:last-child td{border-bottom:none}
+.nx-table tr:hover td{background:var(--nx-bg2)}
+.nx-pill{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;font-family:var(--nx-mono)}
+.pill-red{background:#FCEBEB;color:#A32D2D}
+.pill-amber{background:#FAEEDA;color:#854F0B}
+.pill-green{background:#EAF3DE;color:#3B6D11}
+.pill-blue{background:#E6F1FB;color:#185FA5}
+.pill-gray{background:var(--nx-bg2);color:var(--nx-muted)}
+.nx-alert{display:flex;gap:10px;padding:10px 14px;border-radius:var(--radius-md);margin-bottom:8px;font-size:12px;line-height:1.5;border:0.5px solid}
+.nx-alert-icon{font-size:14px;flex-shrink:0}
+.nx-alert-danger{background:#FCEBEB;border-color:#F7C1C1;color:#791F1F}
+.nx-alert-warn{background:#FAEEDA;border-color:#FAC775;color:#633806}
+.nx-alert-info{background:#E6F1FB;border-color:#B5D4F4;color:#0C447C}
+.nx-alert-success{background:#EAF3DE;border-color:#C0DD97;color:#27500A}
+.nx-chat-wrap{display:flex;flex-direction:column;height:560px}
+.nx-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.nx-msg{max-width:85%;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6}
+.nx-msg-user{align-self:flex-end;background:var(--nx-accent);color:white;border-bottom-right-radius:3px}
+.nx-msg-ai{align-self:flex-start;background:var(--nx-bg2);color:var(--nx-text);border-bottom-left-radius:3px;border:0.5px solid var(--nx-border)}
+.nx-msg-label{font-size:10px;font-family:var(--nx-mono);font-weight:500;margin-bottom:5px;letter-spacing:0.4px;opacity:.7}
+.nx-chat-input-wrap{padding:12px 16px;border-top:0.5px solid var(--nx-border);display:flex;gap:8px;align-items:flex-end;background:var(--nx-bg)}
+.nx-chat-input{flex:1;padding:10px 14px;font-size:13px;font-family:var(--nx-font);border:0.5px solid var(--nx-border2);border-radius:var(--radius-md);background:var(--nx-bg2);color:var(--nx-text);resize:none;min-height:40px;max-height:120px;outline:none;line-height:1.5}
+.nx-chat-input:focus{border-color:var(--nx-accent)}
+.nx-send-btn{padding:10px 16px;background:var(--nx-accent);color:white;border:none;border-radius:var(--radius-md);font-size:12px;font-weight:600;font-family:var(--nx-font);cursor:pointer;white-space:nowrap;transition:background .15s}
+.nx-send-btn:hover{background:var(--nx-accent2)}
+.nx-send-btn:disabled{opacity:.5;cursor:not-allowed}
+.nx-quick-btns{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px 0}
+.nx-quick-btn{font-size:11px;padding:5px 10px;border:0.5px solid var(--nx-border2);border-radius:20px;background:var(--nx-bg2);color:var(--nx-muted);cursor:pointer;font-family:var(--nx-font);transition:all .15s;white-space:nowrap}
+.nx-quick-btn:hover{border-color:var(--nx-accent);color:var(--nx-accent);background:var(--nx-bg)}
+.nx-thinking{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--nx-muted);font-family:var(--nx-mono)}
+.nx-dots span{display:inline-block;width:5px;height:5px;background:var(--nx-accent);border-radius:50%;animation:nx-dot 1.2s ease-in-out infinite}
+.nx-dots span:nth-child(2){animation-delay:.2s}
+.nx-dots span:nth-child(3){animation-delay:.4s}
+@keyframes nx-dot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.nx-heatmap{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.nx-heat-cell{height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--nx-mono);font-weight:500;cursor:pointer;transition:transform .15s;text-align:center;line-height:1.3}
+.nx-heat-cell:hover{transform:scale(1.05)}
+.heat-1{background:#EAF3DE;color:#27500A}.heat-2{background:#C0DD97;color:#27500A}
+.heat-3{background:#FAEEDA;color:#633806}.heat-4{background:#FAC775;color:#633806}
+.heat-5{background:#F7C1C1;color:#791F1F}.heat-6{background:#E24B4A;color:white}
+.nx-kpi-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--nx-border)}
+.nx-kpi-row:last-child{border-bottom:none}
+.nx-kpi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nx-kpi-label{flex:1;font-size:12px;color:var(--nx-text);font-weight:500}
+.nx-kpi-sub{font-size:10px;color:var(--nx-muted);margin-top:1px}
+.nx-progress{width:100%;height:4px;background:var(--nx-bg2);border-radius:2px;margin-top:6px;overflow:hidden}
+.nx-progress-fill{height:100%;border-radius:2px;background:var(--nx-accent)}
+.nx-scenario-card{background:var(--nx-bg2);border:0.5px solid var(--nx-border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.nx-scenario-card:hover{border-color:var(--nx-accent)}
+.nx-scenario-card.selected{border-color:var(--nx-accent);border-width:1.5px;background:var(--nx-bg)}
+.nx-scenario-title{font-size:12px;font-weight:600;color:var(--nx-text);margin-bottom:4px}
+.nx-scenario-meta{font-size:11px;color:var(--nx-muted);line-height:1.5}
+.nx-sidebar{width:220px;border-left:0.5px solid var(--nx-border);padding:16px;display:flex;flex-direction:column;gap:16px;background:var(--nx-bg2)}
+.nx-sidebar-title{font-size:10px;font-family:var(--nx-mono);font-weight:500;color:var(--nx-hint);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.nx-mini-stat{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--nx-border);font-size:11px}
+.nx-mini-stat:last-child{border-bottom:none}
+.nx-mini-stat-label{color:var(--nx-muted)}
+.nx-mini-stat-val{font-weight:600;color:var(--nx-text);font-family:var(--nx-mono)}
+.nx-activity-item{display:flex;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--nx-border);font-size:11px}
+.nx-activity-item:last-child{border-bottom:none}
+.nx-activity-dot{width:6px;height:6px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.nx-activity-text{color:var(--nx-muted);line-height:1.5}
+.nx-activity-bold{font-weight:600;color:var(--nx-text)}
+.nx-waterfall{display:flex;flex-direction:column;gap:6px}
+.nx-waterfall-row{display:flex;align-items:center;gap:8px;font-size:11px}
+.nx-waterfall-label{width:130px;color:var(--nx-muted);font-size:11px;flex-shrink:0}
+.nx-waterfall-bar{flex:1;height:20px;background:var(--nx-bg2);border-radius:3px;position:relative;overflow:hidden}
+.nx-waterfall-fill{position:absolute;top:0;bottom:0;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10px;font-family:var(--nx-mono);font-weight:500;white-space:nowrap}
+.nx-insights-list{display:flex;flex-direction:column;gap:10px}
+.nx-insight-item{background:var(--nx-bg2);border-left:3px solid var(--nx-accent);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:10px 12px;font-size:12px;line-height:1.6;color:var(--nx-text)}
+.nx-insight-item.warn{border-left-color:var(--nx-warn)}
+.nx-insight-item.danger{border-left-color:var(--nx-danger)}
+.nx-insight-item.info{border-left-color:var(--nx-info)}
+.nx-insight-tag{font-size:9px;font-family:var(--nx-mono);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;opacity:.7}
+
+/* API KEY MODAL */
+.nx-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:flex;align-items:center;justify-content:center}
+.nx-modal{background:var(--nx-bg);border-radius:var(--radius-lg);padding:28px;width:460px;max-width:90vw;border:0.5px solid var(--nx-border)}
+.nx-modal-title{font-size:16px;font-weight:700;margin-bottom:6px;letter-spacing:-0.3px}
+.nx-modal-sub{font-size:12px;color:var(--nx-muted);margin-bottom:20px;line-height:1.6}
+.nx-modal input{width:100%;padding:10px 14px;font-size:13px;font-family:var(--nx-mono);border:0.5px solid var(--nx-border2);border-radius:var(--radius-md);background:var(--nx-bg2);color:var(--nx-text);outline:none;margin-bottom:12px}
+.nx-modal input:focus{border-color:var(--nx-accent)}
+.nx-modal-note{font-size:11px;color:var(--nx-muted);line-height:1.6;margin-bottom:16px;padding:10px 12px;background:var(--nx-bg2);border-radius:var(--radius-md);border-left:3px solid var(--nx-accent)}
+</style>
+</head>
+<body>
+
+<!-- API KEY MODAL -->
+<div class="nx-modal-overlay" id="api-modal">
+  <div class="nx-modal">
+    <div class="nx-modal-title">NEXUS·HC · API Configuration</div>
+    <div class="nx-modal-sub">Enter your Anthropic API key to activate the AI Advisory Engine. Your key is stored only in your browser session and never transmitted anywhere except directly to Anthropic.</div>
+    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
+    <div class="nx-modal-note">
+      Get a free API key at <strong>console.anthropic.com</strong> → API Keys. Cost is approximately $0.003 per advisory query. For NPA internal use, keep your key confidential.
+    </div>
+    <button class="nx-send-btn" style="width:100%" onclick="saveApiKey()">Activate Platform ↗</button>
+  </div>
+</div>
+
+<div id="nexus-root">
+  <div class="nx-header">
+    <div class="nx-logo">
+      <div class="nx-logo-mark">
+        <svg viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="3" fill="white" opacity="0.9"/>
+          <path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+        </svg>
+      </div>
+      <div>
+        <div class="nx-logo-text">NEXUS·HC</div>
+        <div class="nx-logo-sub">Intelligence Suite · NPA Zimbabwe</div>
+      </div>
+    </div>
+    <div class="nx-header-right">
+      <span class="nx-badge nx-badge-live">● LIVE</span>
+      <span class="nx-badge nx-badge-org">NPA · 2026</span>
+      <button class="nx-quick-btn" onclick="resetApiKey()" style="font-size:10px;padding:3px 8px">Change API Key</button>
+    </div>
+  </div>
+
+  <div class="nx-nav">
+    <button class="nx-nav-btn active" onclick="showTab('dashboard',this)">Executive Dashboard</button>
+    <button class="nx-nav-btn" onclick="showTab('advisor',this)">AI Advisor</button>
+    <button class="nx-nav-btn" onclick="showTab('workforce',this)">Workforce Analytics</button>
+    <button class="nx-nav-btn" onclick="showTab('irbm',this)">IRBM Tracker</button>
+    <button class="nx-nav-btn" onclick="showTab('scenarios',this)">Decision Engine</button>
+    <button class="nx-nav-btn" onclick="showTab('early',this)">Early Warning</button>
+  </div>
+
+  <div class="nx-body">
+    <div class="nx-main" id="nx-main">
+
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dashboard">
+        <div class="nx-grid-4">
+          <div class="nx-card">
+            <div class="nx-card-title">Workforce Strength</div>
+            <div class="nx-metric-val">1,847</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              <span class="nx-metric-label">Officers & Staff</span>
+              <span class="nx-metric-delta delta-up">+23 YTD</span>
+            </div>
+          </div>
+          <div class="nx-card">
+            <div class="nx-card-title">Attrition Risk Index</div>
+            <div class="nx-metric-val" style="color:#BA7517">34%</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              <span class="nx-metric-label">High-risk personnel</span>
+              <span class="nx-metric-delta delta-down">↑ 8pts vs Q4</span>
+            </div>
+          </div>
+          <div class="nx-card">
+            <div class="nx-card-title">IRBM Compliance</div>
+            <div class="nx-metric-val">68%</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              <span class="nx-metric-label">Contracts submitted</span>
+              <span class="nx-metric-delta delta-warn">32% outstanding</span>
+            </div>
+          </div>
+          <div class="nx-card">
+            <div class="nx-card-title">HC Value Score</div>
+            <div class="nx-metric-val" style="color:#1D9E75">7.2</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              <span class="nx-metric-label">Composite index /10</span>
+              <span class="nx-metric-delta delta-up">+0.4 vs FY2025</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="nx-grid-2">
+          <div class="nx-card">
+            <div class="nx-card-header">
+              <div class="nx-card-title">AI-Generated Insights</div>
+              <span class="nx-pill pill-blue">NEXUS·AI</span>
+            </div>
+            <div class="nx-insights-list">
+              <div class="nx-insight-item danger">
+                <div class="nx-insight-tag">● Critical · Attrition</div>
+                Prosecution grade (D3–E2) turnover surged 41% in the 2–4 yr tenure band. Exit driver is perceived career ceiling, not compensation. Intervention: structured promotion pathways within 90 days.
+              </div>
+              <div class="nx-insight-item warn">
+                <div class="nx-insight-tag">● Warning · Performance</div>
+                Harare and Bulawayo provinces show conviction rate decline of 12 pts. Root cause: 67% of prosecutors in those units have &lt;2 yrs post-qualification experience. Senior mentorship programme is the fastest lever.
+              </div>
+              <div class="nx-insight-item">
+                <div class="nx-insight-tag">● Opportunity · L&D</div>
+                L&D ROI analysis indicates prosecution skills training yields 3.1x value-multiplier. Re-allocating 15% of T&D budget to courtroom skills delivers highest institutional return.
+              </div>
+              <div class="nx-insight-item info">
+                <div class="nx-insight-tag">● Structural · Diversity</div>
+                Female representation at E-band stagnant at 29% for 3 yrs. Pipeline exists at C–D band (44%) but succession pathways are broken. Targeted development cohort recommended.
+              </div>
+            </div>
+          </div>
+
+          <div class="nx-card">
+            <div class="nx-card-header">
+              <div class="nx-card-title">Attrition Risk by Department</div>
+              <span class="nx-pill pill-amber">34% org-wide</span>
+            </div>
+            <div>
+              <div class="nx-risk-bar"><div class="nx-risk-name">Prosecution (Harare)</div><div class="nx-risk-track"><div class="nx-risk-fill" style="width:78%;background:#E24B4A"></div></div><div class="nx-risk-pct">78%</div></div>
+              <div class="nx-risk-bar"><div class="nx-risk-name">Investigations Unit</div><div class="nx-risk-track"><div class="nx-risk-fill" style="width:62%;background:#EF9F27"></div></div><div class="nx-risk-pct">62%</div></div>
+              <div class="nx-risk-bar"><div class="nx-risk-name">Anti-Corruption (ZACC)</div><div class="nx-risk-track"><div class="nx-risk-fill" style="width:55%;background:#EF9F27"></div></div><div class="nx-risk-pct">55%</div></div>
+              <div class="nx-risk-bar"><div class="nx-risk-name">Bulawayo Provincial</div><div class="nx-risk-track"><div class="nx-risk-fill" style="width:49%;background:#FAC775"></div></div><div class="nx-risk-pct">49%</div></div>
+              <div class="nx-risk-bar"><div class="nx-risk-name">Administration</div><div class="nx-risk-track"><div class="nx-risk-fill" style="width:28%;background:#97C459"></div></div><div class="nx-risk-pct">28%</div></div>
+              <div class="nx-risk-bar"><div class="nx-risk-name">Human Capital</div><div class="nx-risk-track"><div class="nx-risk-fill" style="width:18%;background:#1D9E75"></div></div><div class="nx-risk-pct">18%</div></div>
+              <div class="nx-risk-bar"><div class="nx-risk-name">IT & Systems</div><div class="nx-risk-track"><div class="nx-risk-fill" style="width:12%;background:#1D9E75"></div></div><div class="nx-risk-pct">12%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nx-grid-2">
+          <div class="nx-card">
+            <div class="nx-card-header"><div class="nx-card-title">Performance Heatmap · Prosecution Units</div></div>
+            <div style="margin-bottom:8px;font-size:10px;color:var(--nx-muted);font-family:var(--nx-mono)">Conviction rate performance vs target · by unit</div>
+            <div class="nx-heatmap">
+              <div class="nx-heat-cell heat-2">HAR-1<br>89%</div>
+              <div class="nx-heat-cell heat-6">HAR-2<br>51%</div>
+              <div class="nx-heat-cell heat-3">HAR-3<br>74%</div>
+              <div class="nx-heat-cell heat-1">HAR-4<br>92%</div>
+              <div class="nx-heat-cell heat-4">BYO-1<br>67%</div>
+              <div class="nx-heat-cell heat-2">BYO-2<br>85%</div>
+              <div class="nx-heat-cell heat-1">MWE-1<br>91%</div>
+              <div class="nx-heat-cell heat-2">MWE-2<br>88%</div>
+              <div class="nx-heat-cell heat-5">MUT-1<br>58%</div>
+              <div class="nx-heat-cell heat-3">MUT-2<br>76%</div>
+              <div class="nx-heat-cell heat-2">MAT-1<br>83%</div>
+              <div class="nx-heat-cell heat-4">MAT-2<br>69%</div>
+              <div class="nx-heat-cell heat-1">GWR-1<br>94%</div>
+              <div class="nx-heat-cell heat-2">GWR-2<br>87%</div>
+              <div class="nx-heat-cell heat-3">MID-1<br>72%</div>
+              <div class="nx-heat-cell heat-2">MID-2<br>86%</div>
+              <div class="nx-heat-cell heat-1">MAS-1<br>90%</div>
+              <div class="nx-heat-cell heat-5">MAS-2<br>62%</div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:10px;font-size:10px;font-family:var(--nx-mono)">
+              <span style="color:#27500A">■ 85–100%</span>
+              <span style="color:#633806">■ 70–84%</span>
+              <span style="color:#854F0B">■ 55–69%</span>
+              <span style="color:#A32D2D">■ &lt;55%</span>
+            </div>
+          </div>
+
+          <div class="nx-card">
+            <div class="nx-card-header"><div class="nx-card-title">Workforce Composition · Paterson Bands</div></div>
+            <div class="nx-waterfall">
+              <div class="nx-waterfall-row"><div class="nx-waterfall-label">F-Band · Executive</div><div class="nx-waterfall-bar"><div class="nx-waterfall-fill" style="left:0;width:3%;background:#534AB7;color:#EEEDFE">12</div></div></div>
+              <div class="nx-waterfall-row"><div class="nx-waterfall-label">E-Band · Senior Mgmt</div><div class="nx-waterfall-bar"><div class="nx-waterfall-fill" style="left:0;width:8%;background:#7F77DD;color:#EEEDFE">148</div></div></div>
+              <div class="nx-waterfall-row"><div class="nx-waterfall-label">D-Band · Middle Mgmt</div><div class="nx-waterfall-bar"><div class="nx-waterfall-fill" style="left:0;width:22%;background:#1D9E75;color:#E1F5EE">407</div></div></div>
+              <div class="nx-waterfall-row"><div class="nx-waterfall-label">C-Band · Supervisory</div><div class="nx-waterfall-bar"><div class="nx-waterfall-fill" style="left:0;width:38%;background:#0F6E56;color:#E1F5EE">702</div></div></div>
+              <div class="nx-waterfall-row"><div class="nx-waterfall-label">B-Band · Skilled</div><div class="nx-waterfall-bar"><div class="nx-waterfall-fill" style="left:0;width:20%;background:#378ADD;color:#E6F1FB">369</div></div></div>
+              <div class="nx-waterfall-row"><div class="nx-waterfall-label">A-Band · Entry</div><div class="nx-waterfall-bar"><div class="nx-waterfall-fill" style="left:0;width:12%;background:#888780;color:#F1EFE8">209</div></div></div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="nx-alert nx-alert-warn">
+                <span class="nx-alert-icon">⚠</span>
+                <span>D-Band to E-Band pipeline thin. Only 11 high-potentials vs 23 expected retirements in 18 months. Succession risk: HIGH.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI ADVISOR TAB -->
+      <div id="tab-advisor" style="display:none">
+        <div style="margin-bottom:16px">
+          <div class="nx-alert nx-alert-info">
+            <span class="nx-alert-icon">◎</span>
+            <span>Live AI Advisory session. The system has full NPA context including SI 85 of 2015, Paterson grading, and strategic plan priorities.</span>
+          </div>
+        </div>
+        <div class="nx-card" style="padding:0;overflow:hidden">
+          <div class="nx-chat-wrap">
+            <div class="nx-quick-btns">
+              <button class="nx-quick-btn" onclick="quickAsk('Why is prosecution turnaround declining in Harare?')">Prosecution turnaround decline</button>
+              <button class="nx-quick-btn" onclick="quickAsk('What intervention will reduce attrition fastest in the 2-4 year tenure band?')">Reduce attrition fast</button>
+              <button class="nx-quick-btn" onclick="quickAsk('What are the top 3 leadership gaps in the NPA and how should they be addressed?')">Leadership gaps</button>
+              <button class="nx-quick-btn" onclick="quickAsk('Analyse the ROI case for investing in a structured mentorship programme')">Mentorship ROI</button>
+              <button class="nx-quick-btn" onclick="quickAsk('What is the biggest institutional risk to NPA human capital over the next 12 months?')">Institutional risk</button>
+            </div>
+            <div class="nx-chat-msgs" id="chat-msgs">
+              <div style="text-align:center;padding:20px;color:var(--nx-muted);font-size:12px">
+                <div style="font-size:28px;margin-bottom:8px">◎</div>
+                <div style="font-weight:500;color:var(--nx-text);margin-bottom:4px">Chief Human Capital Advisor · NPA Zimbabwe</div>
+                <div>Ask any HC strategy question. Powered by Claude AI.</div>
+              </div>
+            </div>
+            <div class="nx-chat-input-wrap">
+              <textarea class="nx-chat-input" id="chat-input" rows="1" placeholder="Ask your HC strategy question..."></textarea>
+              <button class="nx-send-btn" id="send-btn" onclick="sendMessage()">Send ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WORKFORCE TAB -->
+      <div id="tab-workforce" style="display:none">
+        <div class="nx-grid-3">
+          <div class="nx-card">
+            <div class="nx-card-title" style="margin-bottom:12px">Skills Coverage Gap</div>
+            <div>
+              <div class="nx-kpi-row">
+                <div class="nx-kpi-icon" style="background:#EAF3DE">⚖</div>
+                <div style="flex:1">
+                  <div class="nx-kpi-label">Criminal Law Prosecution</div>
+                  <div class="nx-kpi-sub">Core prosecution competency</div>
+                  <div class="nx-progress"><div class="nx-progress-fill" style="width:82%"></div></div>
+                </div>
+                <span class="nx-pill pill-green">82%</span>
+              </div>
+              <div class="nx-kpi-row">
+                <div class="nx-kpi-icon" style="background:#FAEEDA">📊</div>
+                <div style="flex:1">
+                  <div class="nx-kpi-label">Digital Evidence Handling</div>
+                  <div class="nx-kpi-sub">Critical capability gap</div>
+                  <div class="nx-progress"><div class="nx-progress-fill" style="width:31%;background:#BA7517"></div></div>
+                </div>
+                <span class="nx-pill pill-amber">31%</span>
+              </div>
+              <div class="nx-kpi-row">
+                <div class="nx-kpi-icon" style="background:#FCEBEB">⚡</div>
+                <div style="flex:1">
+                  <div class="nx-kpi-label">Financial Crimes Analysis</div>
+                  <div class="nx-kpi-sub">ZACC alignment gap</div>
+                  <div class="nx-progress"><div class="nx-progress-fill" style="width:24%;background:#A32D2D"></div></div>
+                </div>
+                <span class="nx-pill pill-red">24%</span>
+              </div>
+              <div class="nx-kpi-row">
+                <div class="nx-kpi-icon" style="background:#E6F1FB">🔬</div>
+                <div style="flex:1">
+                  <div class="nx-kpi-label">Forensic Investigation</div>
+                  <div class="nx-kpi-sub">Emerging requirement</div>
+                  <div class="nx-progress"><div class="nx-progress-fill" style="width:44%;background:#378ADD"></div></div>
+                </div>
+                <span class="nx-pill pill-blue">44%</span>
+              </div>
+              <div class="nx-kpi-row">
+                <div class="nx-kpi-icon" style="background:#E1F5EE">🤝</div>
+                <div style="flex:1">
+                  <div class="nx-kpi-label">Leadership & Management</div>
+                  <div class="nx-kpi-sub">D-E band pipeline</div>
+                  <div class="nx-progress"><div class="nx-progress-fill" style="width:58%"></div></div>
+                </div>
+                <span class="nx-pill pill-green">58%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="nx-card">
+            <div class="nx-card-title" style="margin-bottom:12px">Talent Risk Matrix</div>
+            <table class="nx-table">
+              <thead><tr><th>Name/Grade</th><th>Risk</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td><div style="font-weight:500">M. Dube · D3</div><div style="font-size:10px;color:var(--nx-muted)">Sr Prosecutor</div></td><td><span class="nx-pill pill-red">Critical</span></td><td><button class="nx-quick-btn" style="padding:3px 8px;font-size:10px" onclick="quickAsk('What retention intervention should we apply for a critical-risk D3 Senior Prosecutor who has been with NPA for 3 years and shows signs of disengagement?')">Advise ↗</button></td></tr>
+                <tr><td><div style="font-weight:500">T. Moyo · E1</div><div style="font-size:10px;color:var(--nx-muted)">Regional Head</div></td><td><span class="nx-pill pill-amber">High</span></td><td><button class="nx-quick-btn" style="padding:3px 8px;font-size:10px" onclick="quickAsk('How do we retain a high-performing E1 Regional Head receiving external offers? What levers exist under SI 85 of 2015?')">Advise ↗</button></td></tr>
+                <tr><td><div style="font-weight:500">R. Choto · C4</div><div style="font-size:10px;color:var(--nx-muted)">Prosecutor</div></td><td><span class="nx-pill pill-amber">High</span></td><td><button class="nx-quick-btn" style="padding:3px 8px;font-size:10px" onclick="quickAsk('Design a career development intervention for a C4 Prosecutor at 2 years tenure showing attrition signals')">Advise ↗</button></td></tr>
+                <tr><td><div style="font-weight:500">S. Ncube · D1</div><div style="font-size:10px;color:var(--nx-muted)">Investigations</div></td><td><span class="nx-pill pill-amber">Moderate</span></td><td><button class="nx-quick-btn" style="padding:3px 8px;font-size:10px" onclick="quickAsk('What engagement interventions work best for D1 investigators in public prosecution environments?')">Advise ↗</button></td></tr>
+                <tr><td><div style="font-weight:500">P. Zimba · B3</div><div style="font-size:10px;color:var(--nx-muted)">Legal Admin</div></td><td><span class="nx-pill pill-green">Low</span></td><td><span class="nx-pill pill-gray">Monitor</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="nx-card">
+            <div class="nx-card-title" style="margin-bottom:12px">Diversity & Equity Index</div>
+            <div style="margin-bottom:14px;font-size:12px">
+              <div style="font-size:11px;color:var(--nx-muted);margin-bottom:6px">Gender representation by band</div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--nx-border)"><span style="color:var(--nx-muted)">F-Band (Exec)</span><span style="font-weight:600;color:var(--nx-accent)">25% ♀</span></div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--nx-border)"><span style="color:var(--nx-muted)">E-Band (Sr Mgmt)</span><span style="font-weight:600;color:#BA7517">29% ♀</span></div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--nx-border)"><span style="color:var(--nx-muted)">D-Band (Mid Mgmt)</span><span style="font-weight:600;color:var(--nx-accent)">38% ♀</span></div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--nx-border)"><span style="color:var(--nx-muted)">C-Band (Supervisory)</span><span style="font-weight:600;color:var(--nx-accent)">44% ♀</span></div>
+              <div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--nx-muted)">B-Band (Skilled)</span><span style="font-weight:600;color:var(--nx-accent)">51% ♀</span></div>
+            </div>
+            <div class="nx-alert nx-alert-info"><span class="nx-alert-icon">◎</span><span style="font-size:11px">Pipeline paradox: strong female entry pipeline reverses at D→E transition. Structural barrier detected.</span></div>
+            <button class="nx-quick-btn" style="width:100%;margin-top:10px;text-align:center" onclick="quickAsk('Design a targeted intervention to address the gender pipeline paradox at the D to E band transition in the NPA. What specific actions should the Chief Director HCD&M recommend to the Prosecutor General?')">AI Analysis: Fix the pipeline ↗</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- IRBM TAB -->
+      <div id="tab-irbm" style="display:none">
+        <div class="nx-grid-4" style="margin-bottom:16px">
+          <div class="nx-card"><div class="nx-card-title">Contracts Submitted</div><div class="nx-metric-val">1,254</div><div style="margin-top:4px"><div class="nx-progress"><div class="nx-progress-fill" style="width:68%"></div></div></div><div class="nx-metric-label" style="margin-top:4px">68% of 1,847 staff</div></div>
+          <div class="nx-card"><div class="nx-card-title">On Track</div><div class="nx-metric-val" style="color:#1D9E75">847</div><div style="margin-top:4px"><span class="nx-metric-delta delta-up">67% of submitted</span></div></div>
+          <div class="nx-card"><div class="nx-card-title">At Risk</div><div class="nx-metric-val" style="color:#BA7517">293</div><div style="margin-top:4px"><span class="nx-metric-delta delta-warn">23% of submitted</span></div></div>
+          <div class="nx-card"><div class="nx-card-title">Underperforming</div><div class="nx-metric-val" style="color:#A32D2D">114</div><div style="margin-top:4px"><span class="nx-metric-delta delta-down">9% — action required</span></div></div>
+        </div>
+        <div class="nx-card">
+          <div class="nx-card-header">
+            <div class="nx-card-title">IRBM KPI Tracker · Department View</div>
+            <button class="nx-quick-btn" onclick="quickAsk('Which departments have the worst IRBM KPI compliance and what should be done to fix it urgently before the Q2 review?')">AI Diagnosis ↗</button>
+          </div>
+          <table class="nx-table">
+            <thead><tr><th>Department</th><th>Submitted</th><th>On Track</th><th>At Risk</th><th>Under</th><th>Director</th><th>AI Action</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:500">Prosecution · Harare</td><td><span class="nx-pill pill-amber">61%</span></td><td style="color:#1D9E75;font-weight:600">54%</td><td style="color:#BA7517;font-weight:600">28%</td><td style="color:#A32D2D;font-weight:600">18%</td><td style="font-size:11px;color:var(--nx-muted)">T. Chiramba</td><td><button class="nx-quick-btn" style="padding:3px 8px;font-size:10px" onclick="quickAsk('Harare Prosecution has 18% underperformance on IRBM KPIs and 61% submission rate. What are the most likely root causes and what are the 3 most impactful corrective actions?')">Advise ↗</button></td></tr>
+              <tr><td style="font-weight:500">Investigations</td><td><span class="nx-pill pill-red">48%</span></td><td style="color:#1D9E75;font-weight:600">41%</td><td style="color:#BA7517;font-weight:600">35%</td><td style="color:#A32D2D;font-weight:600">24%</td><td style="font-size:11px;color:var(--nx-muted)">K. Muripo</td><td><button class="nx-quick-btn" style="padding:3px 8px;font-size:10px" onclick="quickAsk('Investigations unit has the worst IRBM metrics in the NPA. What structural interventions would the Chief Director recommend to the Prosecutor General?')">Advise ↗</button></td></tr>
+              <tr><td style="font-weight:500">Anti-Corruption</td><td><span class="nx-pill pill-amber">72%</span></td><td style="color:#1D9E75;font-weight:600">68%</td><td style="color:#BA7517;font-weight:600">22%</td><td style="color:#A32D2D;font-weight:600">10%</td><td style="font-size:11px;color:var(--nx-muted)">A. Banda</td><td><button class="nx-quick-btn" style="padding:3px 8px;font-size:10px" onclick="quickAsk('ZACC anti-corruption unit has 10% underperformance - what targeted interventions will close this gap fastest?')">Advise ↗</button></td></tr>
+              <tr><td style="font-weight:500">Human Capital</td><td><span class="nx-pill pill-green">94%</span></td><td style="color:#1D9E75;font-weight:600">88%</td><td style="color:#BA7517;font-weight:600">9%</td><td style="color:#A32D2D;font-weight:600">3%</td><td style="font-size:11px;color:var(--nx-muted)">A. Chivanga</td><td><span class="nx-pill pill-green">On track</span></td></tr>
+              <tr><td style="font-weight:500">Finance & Admin</td><td><span class="nx-pill pill-green">89%</span></td><td style="color:#1D9E75;font-weight:600">82%</td><td style="color:#BA7517;font-weight:600">14%</td><td style="color:#A32D2D;font-weight:600">4%</td><td style="font-size:11px;color:var(--nx-muted)">P. Sithole</td><td><span class="nx-pill pill-green">On track</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SCENARIOS TAB -->
+      <div id="tab-scenarios" style="display:none">
+        <div class="nx-grid-2">
+          <div class="nx-card">
+            <div class="nx-card-title" style="margin-bottom:14px">Scenario Engine · Workforce Decisions</div>
+            <div style="font-size:12px;color:var(--nx-muted);margin-bottom:12px">Select a scenario then run AI trade-off analysis</div>
+            <div class="nx-scenario-card selected" id="sc1" onclick="selectScenario(1)"><div class="nx-scenario-title">Hire 50 new prosecutors vs develop existing cohort</div><div class="nx-scenario-meta">Cost: $2.1M hire vs $480K L&D · Timeline: 18 vs 6 months · Risk: Capacity gap vs Retention risk</div></div>
+            <div class="nx-scenario-card" id="sc2" onclick="selectScenario(2)"><div class="nx-scenario-title">Centralise vs decentralise regional HR functions</div><div class="nx-scenario-meta">Efficiency gain: 18% centralise · Responsiveness: 34% decentralise · Cost implications</div></div>
+            <div class="nx-scenario-card" id="sc3" onclick="selectScenario(3)"><div class="nx-scenario-title">Automate case management vs recruit case managers</div><div class="nx-scenario-meta">Automation: $320K once-off · Recruitment: $180K/yr · Turnaround impact</div></div>
+            <div class="nx-scenario-card" id="sc4" onclick="selectScenario(4)"><div class="nx-scenario-title">Restructure D-band succession pipeline (18-month plan)</div><div class="nx-scenario-meta">23 E-band retirements projected · 11 high-potentials identified · Gap: 12 positions</div></div>
+            <button class="nx-send-btn" style="width:100%;margin-top:12px" id="run-scenario-btn" onclick="runScenario()">Run AI Trade-off Analysis ↗</button>
+          </div>
+          <div class="nx-card" id="scenario-results">
+            <div class="nx-card-title" style="margin-bottom:14px">Analysis Results</div>
+            <div style="text-align:center;padding:30px;color:var(--nx-muted);font-size:12px"><div style="font-size:24px;margin-bottom:8px">⚡</div>Select a scenario and run analysis.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EARLY WARNING TAB -->
+      <div id="tab-early" style="display:none">
+        <div class="nx-grid-3">
+          <div class="nx-card" style="border-left:3px solid #A32D2D">
+            <div class="nx-card-header"><div class="nx-card-title">Institutional Risk Signals</div><span class="nx-pill pill-red">3 CRITICAL</span></div>
+            <div>
+              <div class="nx-alert nx-alert-danger" style="margin-bottom:6px"><span>Prosecution capacity at 71% of mandate levels. If 3 more E-band officers depart, Harare region falls below minimum viable staffing within 60 days.</span></div>
+              <div class="nx-alert nx-alert-danger" style="margin-bottom:6px"><span>IRBM non-compliance in 2 departments now in breach of SI 85 of 2015. Statutory intervention risk if not resolved within 30 days.</span></div>
+              <div class="nx-alert nx-alert-danger" style="margin-bottom:6px"><span>Digital evidence capability at 31% — below threshold required for financial crimes prosecution. 12 cases at risk.</span></div>
+            </div>
+          </div>
+          <div class="nx-card" style="border-left:3px solid #BA7517">
+            <div class="nx-card-header"><div class="nx-card-title">Emerging Risks</div><span class="nx-pill pill-amber">5 WARNING</span></div>
+            <div>
+              <div class="nx-alert nx-alert-warn" style="margin-bottom:6px"><span>Succession gap widening: 4 additional E-band officers approaching voluntary retirement age in Q3 2026.</span></div>
+              <div class="nx-alert nx-alert-warn" style="margin-bottom:6px"><span>T&D budget utilisation at 38% halfway through FY2026. Underspend signals poor training plan execution.</span></div>
+              <div class="nx-alert nx-alert-warn" style="margin-bottom:6px"><span>Employee engagement scores dropped 11pts in Investigations unit — early burnout signal.</span></div>
+              <div class="nx-alert nx-alert-warn"><span>Gender equity targets for E-band unlikely to be met by Dec 2026 at current trajectory.</span></div>
+            </div>
+          </div>
+          <div class="nx-card">
+            <div class="nx-card-header"><div class="nx-card-title">Monitoring Indicators</div><span class="nx-pill pill-green">STABLE</span></div>
+            <div class="nx-insights-list">
+              <div class="nx-insight-item"><div class="nx-insight-tag">◎ Finance</div>Payroll integrity at 98.7%. No anomalies detected in last 90 days.</div>
+              <div class="nx-insight-item"><div class="nx-insight-tag">◎ Discipline</div>14 open cases, 2 pending adjudication. Resolution time within SLA.</div>
+              <div class="nx-insight-item"><div class="nx-insight-tag">◎ L&D</div>2026 Strategic Training Calendar: 8 of 24 programmes delivered. On-track for Q2.</div>
+            </div>
+            <button class="nx-quick-btn" style="width:100%;margin-top:12px;text-align:center" onclick="quickAsk('Give me an executive briefing: what are the 3 most urgent institutional risks the NPA Prosecutor General needs to act on this week, and what should each intervention look like?')">PG Executive Brief ↗</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="nx-sidebar" id="nx-sidebar">
+      <div>
+        <div class="nx-sidebar-title">Key Metrics</div>
+        <div class="nx-mini-stat"><span class="nx-mini-stat-label">Avg tenure</span><span class="nx-mini-stat-val">4.2 yrs</span></div>
+        <div class="nx-mini-stat"><span class="nx-mini-stat-label">Vacancies</span><span class="nx-mini-stat-val">127</span></div>
+        <div class="nx-mini-stat"><span class="nx-mini-stat-label">On leave</span><span class="nx-mini-stat-val">184</span></div>
+        <div class="nx-mini-stat"><span class="nx-mini-stat-label">Disciplinary</span><span class="nx-mini-stat-val">14</span></div>
+        <div class="nx-mini-stat"><span class="nx-mini-stat-label">Training days</span><span class="nx-mini-stat-val">2,841</span></div>
+        <div class="nx-mini-stat"><span class="nx-mini-stat-label">L&D spend</span><span class="nx-mini-stat-val">$124K</span></div>
+      </div>
+      <div>
+        <div class="nx-sidebar-title">Recent Activity</div>
+        <div class="nx-activity-item"><div class="nx-activity-dot" style="background:#A32D2D"></div><div class="nx-activity-text"><span class="nx-activity-bold">Alert:</span> HAR-2 conviction rate critical.</div></div>
+        <div class="nx-activity-item"><div class="nx-activity-dot" style="background:#1D9E75"></div><div class="nx-activity-text"><span class="nx-activity-bold">IRBM:</span> Finance achieved 89% submission.</div></div>
+        <div class="nx-activity-item"><div class="nx-activity-dot" style="background:#BA7517"></div><div class="nx-activity-text"><span class="nx-activity-bold">Risk:</span> E-band succession gap widened.</div></div>
+        <div class="nx-activity-item"><div class="nx-activity-dot" style="background:#185FA5"></div><div class="nx-activity-text"><span class="nx-activity-bold">Training:</span> Courtroom Skills cohort 1 done.</div></div>
+        <div class="nx-activity-item"><div class="nx-activity-dot" style="background:#1D9E75"></div><div class="nx-activity-text"><span class="nx-activity-bold">Hire:</span> 8 D-band prosecutors onboarded.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var API_KEY = sessionStorage.getItem('nexus_api_key') || '';
+var selectedScenario = 1;
+var isLoading = false;
+
+var SYSTEM_PROMPT = `You are the AI Chief Human Capital Advisor for the National Prosecuting Authority (NPA) of Zimbabwe — a constitutional institution established under Section 258 of the Constitution of Zimbabwe.
+
+You operate with the expertise of a McKinsey senior partner specialising in Human Capital, a seasoned CHRO, and a People Analytics thought leader. You are advising Admire Chivanga, Chief Director Human Capital Development & Management, who reports to the Prosecutor General.
+
+NPA Context:
+- 1,847 staff across prosecution, investigations, anti-corruption, and administration
+- Legislative framework: NPA Act Chapter 7:20, SI 85 of 2015, Labour Act Chapter 28:01
+- Paterson job grading system (A through F bands)
+- 10 provincial offices including Harare and Bulawayo as largest
+- Current challenges: 34% attrition risk index, 68% IRBM compliance, digital capability gap
+- Strategic Plan 2026-2030 priorities: prosecution excellence, institutional integrity, digital transformation
+
+Your responses must:
+1. Lead with the most important insight or recommendation (Pyramid Principle)
+2. Be evidence-based and specific to NPA context
+3. Name the root cause before prescribing solutions
+4. Provide actionable next steps with owners and timelines
+5. Flag trade-offs honestly
+6. Be concise but strategic — executive-grade quality
+7. Reference relevant legislation (SI 85, Labour Act) where applicable
+
+Never give generic HR advice. Every response must be NPA-specific, strategic, and immediately actionable.`;
+
+var SCENARIOS = {
+  1: 'Analyse the strategic trade-offs between hiring 50 new prosecutors (cost $2.1M, 18-month timeline) versus developing the existing cohort through intensive L&D ($480K, 6-month timeline). Consider NPA Zimbabwe context: SI 85 of 2015 constraints, current attrition risk, Paterson grading implications, and institutional capability impact. Provide a McKinsey-style recommendation with clear rationale, risks, and implementation steps.',
+  2: 'Analyse whether the NPA should centralise or decentralise its regional HR functions. Current state: HR is partially decentralised across 10 provinces. Consider efficiency gains from centralisation (estimated 18%), responsiveness gains from decentralisation (34%), budget constraints, and the Chief Director HCD&M governance model. Provide a clear recommendation with trade-off analysis.',
+  3: 'Compare automating case management systems ($320K once-off investment) versus recruiting 8 additional case managers ($180K/year ongoing). Consider the impact on prosecution turnaround times, current digital capability gaps, and the NPA strategic plan 2026-2030. Which delivers better ROI for institutional performance?',
+  4: 'Design an 18-month D-band to E-band succession plan for the NPA. Context: 23 E-band officers face retirement in 18 months, only 11 high-potentials identified, leaving a gap of 12 positions. What is the most credible and implementable succession strategy the Chief Director HCD&M can present to the Prosecutor General?'
+};
+
+function init() {
+  if (!API_KEY) {
+    document.getElementById('api-modal').style.display = 'flex';
+  } else {
+    document.getElementById('api-modal').style.display = 'none';
+  }
+}
+
+function saveApiKey() {
+  var val = document.getElementById('api-key-input').value.trim();
+  if (!val || !val.startsWith('sk-')) {
+    alert('Please enter a valid Anthropic API key starting with sk-');
+    return;
+  }
+  API_KEY = val;
+  sessionStorage.setItem('nexus_api_key', val);
+  document.getElementById('api-modal').style.display = 'none';
+}
+
+function resetApiKey() {
+  sessionStorage.removeItem('nexus_api_key');
+  API_KEY = '';
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-modal').style.display = 'flex';
+}
+
+function showTab(tab, btn) {
+  document.querySelectorAll('.nx-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var tabs = ['dashboard','advisor','workforce','irbm','scenarios','early'];
+  tabs.forEach(function(t){
+    var el = document.getElementById('tab-' + t);
+    if (el) el.style.display = (t === tab) ? 'block' : 'none';
+  });
+  var sidebar = document.getElementById('nx-sidebar');
+  if (sidebar) sidebar.style.display = tab === 'advisor' ? 'none' : 'flex';
+}
+
+function selectScenario(n) {
+  selectedScenario = n;
+  for (var i = 1; i <= 4; i++) {
+    var el = document.getElementById('sc' + i);
+    if (el) el.classList.toggle('selected', i === n);
+  }
+}
+
+async function runScenario() {
+  if (!API_KEY) { document.getElementById('api-modal').style.display = 'flex'; return; }
+  var btn = document.getElementById('run-scenario-btn');
+  var results = document.getElementById('scenario-results');
+  if (isLoading) return;
+  isLoading = true;
+  btn.disabled = true;
+  btn.textContent = 'Analysing...';
+  results.innerHTML = '<div class="nx-card-title" style="margin-bottom:14px">Analysis Results</div><div class="nx-thinking"><div class="nx-dots"><span></span><span></span><span></span></div><span style="margin-left:6px">AI running trade-off analysis...</span></div>';
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM_PROMPT, messages: [{ role: 'user', content: SCENARIOS[selectedScenario] }] })
+    });
+    var data = await resp.json();
+    var text = data.content && data.content[0] ? data.content[0].text : 'Analysis unavailable.';
+    results.innerHTML = '<div class="nx-card-title" style="margin-bottom:14px">AI Trade-off Analysis</div><div style="font-size:12px;line-height:1.8;color:var(--nx-text);white-space:pre-wrap">' + esc(text) + '</div>';
+  } catch(e) {
+    results.innerHTML = '<div class="nx-card-title" style="margin-bottom:14px">Analysis Results</div><div class="nx-alert nx-alert-warn"><span>Connection error. Check your API key and network.</span></div>';
+  }
+  isLoading = false;
+  btn.disabled = false;
+  btn.textContent = 'Run AI Trade-off Analysis ↗';
+}
+
+function quickAsk(q) {
+  document.querySelectorAll('.nx-nav-btn').forEach(function(b,i){ b.classList.toggle('active', i===1); });
+  var tabs = ['dashboard','advisor','workforce','irbm','scenarios','early'];
+  tabs.forEach(function(t){ var el=document.getElementById('tab-'+t); if(el) el.style.display=(t==='advisor'?'block':'none'); });
+  var sidebar = document.getElementById('nx-sidebar');
+  if (sidebar) sidebar.style.display = 'none';
+  var input = document.getElementById('chat-input');
+  if (input) { input.value = q; }
+  setTimeout(sendMessage, 100);
+}
+
+async function sendMessage() {
+  if (!API_KEY) { document.getElementById('api-modal').style.display = 'flex'; return; }
+  var input = document.getElementById('chat-input');
+  var btn = document.getElementById('send-btn');
+  var msgs = document.getElementById('chat-msgs');
+  if (!input || !btn || !msgs || isLoading) return;
+  var text = input.value.trim();
+  if (!text) return;
+  isLoading = true;
+  input.value = '';
+  btn.disabled = true;
+
+  var userDiv = document.createElement('div');
+  userDiv.className = 'nx-msg nx-msg-user';
+  userDiv.innerHTML = '<div class="nx-msg-label">You</div>' + esc(text);
+  msgs.appendChild(userDiv);
+
+  var thinkDiv = document.createElement('div');
+  thinkDiv.className = 'nx-msg nx-msg-ai';
+  thinkDiv.innerHTML = '<div class="nx-msg-label">Nexus·HC Advisor</div><div class="nx-thinking"><div class="nx-dots"><span></span><span></span><span></span></div><span style="margin-left:6px">Analysing...</span></div>';
+  msgs.appendChild(thinkDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM_PROMPT, messages: [{ role: 'user', content: text }] })
+    });
+    var data = await resp.json();
+    var reply = data.content && data.content[0] ? data.content[0].text : 'Unable to generate response.';
+    thinkDiv.innerHTML = '<div class="nx-msg-label">Nexus·HC Advisor</div><div style="white-space:pre-wrap;font-size:12px;line-height:1.7">' + esc(reply) + '</div>';
+  } catch(e) {
+    thinkDiv.innerHTML = '<div class="nx-msg-label">Nexus·HC Advisor</div><div style="color:var(--nx-muted)">Connection error. Check API key.</div>';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+  isLoading = false;
+  btn.disabled = false;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('chat-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+document.getElementById('api-key-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') saveApiKey();
+});
+
+init();
+</script>
+</body>
+</html>
